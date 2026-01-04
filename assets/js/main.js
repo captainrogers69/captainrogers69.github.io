@@ -278,4 +278,17 @@
     window.addEventListener("scroll", toggleSiteName);
     toggleSiteName(); // run on load
   });
+
+  document.querySelectorAll("#navmenu a").forEach((link) => {
+    link.addEventListener("click", () => {
+      const body = document.body;
+      const navToggle = document.querySelector(".mobile-nav-toggle");
+
+      if (body.classList.contains("mobile-nav-active")) {
+        body.classList.remove("mobile-nav-active");
+        navToggle.classList.toggle("bi-list");
+        navToggle.classList.toggle("bi-x");
+      }
+    });
+  });
 })();

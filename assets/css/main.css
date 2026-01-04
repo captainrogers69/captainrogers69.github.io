@@ -441,6 +441,7 @@ h6 {
   }
 
   .mobile-nav-active .navmenu {
+    max-height: 35vh;
     position: fixed;
     overflow: hidden;
     inset: 0;
