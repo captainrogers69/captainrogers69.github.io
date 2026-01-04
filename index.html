@@ -91,7 +91,20 @@
     <main class="main">
       <!-- TODO: Home section starts here -->
       <section id="home-scroll" class="hero section dark-background">
-        <img src="assets/img/hero-bg-3.png" alt="" data-aos="fade-in" />
+        <!-- <img src="assets/img/hero-bg-3.png" alt="" data-aos="fade-in" /> -->
+        <picture>
+          <!-- Mobile -->
+          <source
+            srcset="assets/img/bg-4.png"
+            media="(max-width: 768px)"
+          />
+          <!-- Desktop / default -->
+          <img
+            src="assets/img/hero-bg-3.png"
+            alt=""
+            data-aos="fade-in"
+          />
+        </picture>
 
         <div class="container" data-aos="zoom-out" data-aos-delay="100">
           <h2>Mayank Yadav</h2>
@@ -128,6 +141,22 @@
       <!-- About Section -->
       <section id="about-scroll" class="about section main">
         <section class="about section">
+          <div class="hero-footer text-center mx-auto pb-4">
+            <h3 class="sitename">Greetings 👋🏻</h3>
+            <p>Looking for a Flutter-weight champion? You've landed in the right place!</p>
+          </div>
+          <div class="page-title" data-aos="fade">
+            <div class="heading">
+              <div class="container">
+                <div class="row">
+                  <div class="col-lg-8">
+                    <h1 class="text-start">About</h1>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Page Title -->
           <div class="container" data-aos="fade-up" data-aos-delay="100">
             <div class="row gy-4 justify-content-center">
               <div class="col-lg-4">
@@ -667,6 +696,21 @@
 
       <!-- TODO: portfolio section starts here -->
       <section id="portfolio-scroll" class="portfolio section">
+        <div class="hero-footer text-center mx-auto pb-4">
+          <p>I'm not just a Flutter developer, I'm a Flutter-fly!</p>
+        </div>
+        <div class="page-title" data-aos="fade">
+            <div class="heading">
+              <div class="container">
+                <div class="row">
+                  <div class="col-lg-8">
+                    <h1 class="text-start">Portfolio</h1>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Page Title -->
         <div class="container">
           <div
             class="isotope-layout"
@@ -983,6 +1027,21 @@
 
       <!-- TODO: contact section starts here -->
       <section id="contact-scroll" class="contact section">
+          <div class="hero-footer text-center mx-auto pb-4">
+            <p>I'm a Flutter-ing heart when it comes to app development.</p>
+          </div>
+        <div class="page-title" data-aos="fade">
+            <div class="heading">
+              <div class="container">
+                <div class="row">
+                  <div class="col-lg-8">
+                    <h1 class="text-start">Contact</h1>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Page Title -->
         <div class="container" data-aos="fade-up" data-aos-delay="100">
           <div class="row gy-4">
             <div class="col-md-6">
@@ -1130,11 +1189,8 @@
 
     <footer id="footer" class="footer dark-background">
       <div class="container">
-        <h3 class="sitename">Greetings👋🏻</h3>
-        <p>
-          Looking for a Flutter-weight champion? You've landed in the right
-          place!
-        </p>
+        <!-- <h3 class="sitename">reetings👋🏻</h3> -->
+        <p>Let's build something amazing together. Flutter-ly awesome, that is.</p>
 
         <div class="social-links d-flex justify-content-center">
           <a href="https://www.github.com/captainrogers69/"
