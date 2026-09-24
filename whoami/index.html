@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>mayank@github ~ whoami</title>
+<title>mayank-mobiledev@github ~ whoami</title>
 <meta name="description" content="Mayank Yadav — interactive terminal-style profile with live GitHub contribution stats." />
-<meta property="og:title" content="mayank@github ~ whoami" />
-<meta property="og:description" content="Mobile Team Lead · Flutter Specialist — interactive terminal profile." />
+<meta property="og:title" content="mayank-mobiledev@github ~ whoami" />
+<meta property="og:description" content="Senior Mobile Engineer · Flutter Specialist — interactive terminal profile." />
 <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/go2homes-f6901.firebasestorage.app/o/private%2Fcover-image-.png?alt=media&token=fa91a596-c9b8-414a-ac3b-758ecc77d227" />
 <link href="../assets/img/favicon.jpg" rel="icon" />
 <style>
@@ -91,7 +91,7 @@
 
   <div class="hero">
     <pre id="bannerArt"></pre>
-    <div class="tagline">Mobile Team Lead · Flutter Specialist · 25+ Apps · 450k+ Users</div>
+    <div class="tagline">Senior Mobile Engineer · Flutter Specialist · 25+ Apps · 450k+ Users</div>
   </div>
 
   <div class="window">
@@ -99,11 +99,11 @@
       <div class="dot" style="background:var(--red)"></div>
       <div class="dot" style="background:var(--yellow)"></div>
       <div class="dot" style="background:#27c93f"></div>
-      <div class="label">mayank@github: ~</div>
+      <div class="label">mayank-mobiledev@github: ~</div>
     </div>
     <div class="term" id="term"></div>
     <div class="inputRow">
-      <span class="prompt-tag">mayank@github:~$</span>
+      <span class="prompt-tag">mayank-mobiledev@github:~$</span>
       <input id="cmdInput" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="terminal command" />
     </div>
   </div>
@@ -343,19 +343,18 @@ const COMMANDS = {
     ].forEach(([c, d]) => line(`  <span class="out-cmd">${c.padEnd(15)}</span><span class="out-dim">${d}</span>`));
   },
   whoami() {
-    line(`<span class="out-white">Mobile engineer & Flutter specialist, MCA, based in Moradabad, IN</span>`);
-    line(`<span class="out-dim">Currently: Mobile Team Lead @ SoluLab — leading 8 engineers (Flutter / Native / RN)</span>`);
-    line(`<span class="out-dim">Past: Codezlabs · Allevents · Wash in Time · Gymin</span>`);
+    line(`<span class="out-white">Mobile engineer & Flutter specialist, MCA, based in Gurugram, IN</span>`);
+    line(`<span class="out-dim">Currently: Senior Mobile Engineer @ CodeVIT</span>`);
+    line(`<span class="out-dim">Past: SoluLab · AllEvents · WashInTime</span>`);
     line(`<span class="out-dim">25+ apps shipped · 450k+ users · obsessed with clean architecture & performance</span>`);
   },
   experience() {
     [
-      ["2025 - now", "Mobile Team Lead", "SoluLab"],
-      ["2024", "Flutter Developer", "Codezlabs"],
+      ["2026 - now", "Senior Mobile Engineer", "CodeVIT"],
+      ["2025 - 2026", "Senior Mobile Engineer", "SoluLab"],
       ["2023 - 2024", "Flutter Developer", "Allevents"],
       ["2022 - 2023", "Jr. Mobile App Developer", "Wash in Time"],
       ["2022", "Mobile App Intern", "Wash in Time"],
-      ["2021 - 2022", "Flutter Intern", "Gymin"],
     ].forEach(([d, r, c]) => line(`<span class="out-green">${d.padEnd(13)}</span><span class="out-white">${r.padEnd(26)}</span><span class="out-dim">${c}</span>`));
   },
   skills() {
@@ -380,14 +379,15 @@ const COMMANDS = {
   },
   education() {
     line(`<span class="out-green">2020 - 2022</span>  <span class="out-white">Master of Computer Applications</span>  <span class="out-dim">Teerthankar Mahaveer University</span>`);
-    line(`<span class="out-green">2016 - 2019</span>  <span class="out-white">Bachelor of Science (PCM)      </span>  <span class="out-dim">Moradabad</span>`);
+    line(`<span class="out-green">2016 - 2019</span>  <span class="out-white">Bachelor of Science (PCM)</span>`);
   },
   contact() {
     line(`<span class="out-white">portfolio</span>  <a href="${LINKS.portfolio}">captainrogers69.github.io</a>`);
     line(`<span class="out-white">linkedin </span>  <a href="${LINKS.linkedin}" target="_blank" rel="noopener">linkedin.com/in/mayank-mobiledev</a>`);
-    line(`<span class="out-white">github   </span>  <a href="${LINKS.github}" target="_blank" rel="noopener">github.com/captainrogers69</a>`);
+    line(`<span class="out-white">github   </span>  <a href="${LINKS.github}" target="_blank" rel="noopener">github.com/mayank-mobiledev</a>`);
     line(`<span class="out-white">email    </span>  <a href="mailto:myyadavmayank1998@gmail.com">myyadavmayank1998@gmail.com</a>`);
     line(`<span class="out-green">status   </span>  open to freelance`);
+    line(`<span class="out-green">location </span>  Gurugram, IN`);
   },
   photo() {
     const img = document.createElement("img");
@@ -421,7 +421,7 @@ const COMMANDS = {
     line(`<pre style="color:var(--green);margin:0;font-size:9px;">${BANNER}</pre>`);
   },
   sudo() {
-    line(`<span class="out-yellow">[sudo] password for mayank:</span> <span class="out-dim">nice try. this is a static site.</span>`);
+    line(`<span class="out-yellow">[sudo] password for mayank-mobiledev:</span> <span class="out-dim">nice try. this is a static site.</span>`);
   },
   flutter() {
     line(`<span class="out-green">Flutter 3.x • channel stable</span> <span class="out-dim">— hot reload is my love language.</span>`);
@@ -432,7 +432,7 @@ COMMANDS["ls"] = COMMANDS.projects;
 
 function runCommand(raw) {
   const trimmed = raw.trim();
-  line(`<span class="prompt-tag">mayank@github:~$</span> <span class="out-white">${escapeHtml(trimmed)}</span>`, "prompt-line");
+  line(`<span class="prompt-tag">mayank-mobiledev@github:~$</span> <span class="out-white">${escapeHtml(trimmed)}</span>`, "prompt-line");
   if (!trimmed) return;
   const [cmd, ...args] = trimmed.split(/\s+/);
   const key = cmd.toLowerCase();
@@ -510,7 +510,7 @@ function startMatrix() {
 
 /* ---------------------------------------------------------------------- */
 function boot() {
-  line(`<span class="out-green">connected to github.com/${GITHUB_USER}</span>`);
+  line(`<span class="out-green">connected to github.com/mayank-mobiledev</span>`);
   line(`<span class="out-dim">type 'help' to see available commands</span>`);
   blank();
   const statsWrap = document.createElement("div");
