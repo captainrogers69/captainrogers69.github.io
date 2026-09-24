@@ -607,45 +607,81 @@
       let DATA = null; // last-year summary (+ DATA.all for all-time)
       window.__getData = () => DATA; // debug hook
 
-      async function loadData() {
-        const today = isoDate(new Date());
-        let days,
-          repos = FALLBACK.repos,
-          since = FALLBACK.since;
+      const CACHE_KEY = "whoami-gh-cache-v1";
 
-        const contrib = fetch(CONTRIB_URL, { cache: "no-store" }).then((r) => {
-          if (!r.ok) throw new Error("bad status " + r.status);
-          return r.json();
-        });
-        const user = fetch(USER_URL)
-          .then((r) => (r.ok ? r.json() : null))
-          .catch(() => null);
-
+      function readCache() {
         try {
-          const json = await contrib;
-          days = json.contributions.map((d) => ({
+          return JSON.parse(localStorage.getItem(CACHE_KEY));
+        } catch (e) {
+          return null;
+        }
+      }
+      function writeCache(v) {
+        try {
+          localStorage.setItem(CACHE_KEY, JSON.stringify(v));
+        } catch (e) {}
+      }
+
+      function fetchJson(url, ms) {
+        const ctrl = new AbortController();
+        const t = setTimeout(() => ctrl.abort(), ms);
+        return fetch(url, { signal: ctrl.signal })
+          .then((r) => {
+            if (!r.ok) throw new Error("bad status " + r.status);
+            return r.json();
+          })
+          .finally(() => clearTimeout(t));
+      }
+
+      function applyData(src) {
+        const today = isoDate(new Date());
+        const days = src.days
+          .filter((d) => d.date <= today)
+          .sort((a, b) => (a.date < b.date ? -1 : 1));
+        DATA = summarize(lastYear(days));
+        DATA.all = summarize(days);
+        DATA.all.repos = src.repos;
+        DATA.all.since = src.since;
+      }
+
+      // Paint instantly from cache / baked snapshot, then refresh from the
+      // network in the background and update the numbers in place.
+      async function loadData() {
+        const cached = readCache();
+        const base = cached || {
+          days: expandFallback(FALLBACK),
+          repos: FALLBACK.repos,
+          since: FALLBACK.since,
+        };
+        applyData(base);
+        renderStats(true);
+
+        const [contrib, user] = await Promise.allSettled([
+          fetchJson(CONTRIB_URL, 8000),
+          fetchJson(USER_URL, 8000),
+        ]);
+        const fresh = { ...base };
+        let changed = false;
+        if (
+          contrib.status === "fulfilled" &&
+          contrib.value.contributions?.length
+        ) {
+          fresh.days = contrib.value.contributions.map((d) => ({
             date: d.date,
             count: d.count,
           }));
-          if (!days.length) throw new Error("empty");
-        } catch (e) {
-          days = expandFallback(FALLBACK);
+          changed = true;
         }
-        days = days
-          .filter((d) => d.date <= today)
-          .sort((a, b) => (a.date < b.date ? -1 : 1));
-
-        const u = await user;
+        const u = user.status === "fulfilled" ? user.value : null;
         if (u && typeof u.public_repos === "number") {
-          repos = u.public_repos;
-          since = u.created_at.slice(0, 10);
+          fresh.repos = u.public_repos;
+          fresh.since = u.created_at.slice(0, 10);
+          changed = true;
         }
-
-        DATA = summarize(lastYear(days));
-        DATA.all = summarize(days);
-        DATA.all.repos = repos;
-        DATA.all.since = since;
-        renderStats();
+        if (!changed) return;
+        writeCache(fresh);
+        applyData(fresh);
+        renderStats(false);
       }
 
       /* ---------------------------------------------------------------------- */
@@ -701,7 +737,7 @@
         ];
       }
 
-      function buildStatsEl() {
+      function buildStatsEl(animate = true) {
         const wrap = document.createElement("div");
         statRows().forEach(([cmd, items]) => {
           const head = document.createElement("div");
@@ -712,20 +748,20 @@
           items.forEach(([val, fmt, icon, label]) => {
             const card = document.createElement("div");
             card.className = "stat";
-            card.innerHTML = `<div class="num">${fmt(0)}</div><div class="lbl"><span class="ico">${icon}</span>${label}</div>`;
+            card.innerHTML = `<div class="num">${fmt(animate ? 0 : val)}</div><div class="lbl"><span class="ico">${icon}</span>${label}</div>`;
             box.appendChild(card);
-            countUp(card.querySelector(".num"), val, fmt);
+            if (animate) countUp(card.querySelector(".num"), val, fmt);
           });
           wrap.appendChild(box);
         });
         return wrap;
       }
 
-      function renderStats() {
+      function renderStats(animate) {
         const box = document.getElementById("statsBox");
         if (!box || !DATA) return;
         box.innerHTML = "";
-        box.appendChild(buildStatsEl());
+        box.appendChild(buildStatsEl(animate));
       }
 
       /* ---------------------------------------------------------------------- */
@@ -823,16 +859,16 @@
         },
         whoami() {
           line(
-            `<span class="out-white">Mobile engineer & Flutter specialist, MCA, based in Gurugram, IN</span>`,
+            `<span class="out-white">I build fast, easy-to-use apps by day · gamer by night · Gurugram, IN</span>`,
           );
           line(
             `<span class="out-dim">Currently: Senior Mobile Engineer @ CodeVIT</span>`,
           );
           line(
-            `<span class="out-dim">Past: SoluLab · AllEvents · WashInTime</span>`,
+            `<span class="out-dim">Previous: SoluLab · AllEvents · WashInTime</span>`,
           );
           line(
-            `<span class="out-dim">25+ apps shipped · 450k+ users · obsessed with clean architecture & performance</span>`,
+            `<span class="out-dim">Open to freelance & collabs · got an app idea? let's talk →</span>`,
           );
         },
         experience() {
