@@ -13,7 +13,7 @@
   :root{
     --bg:#0d1117; --bg2:#161b22; --frame:#30363d; --muted:#8b949e;
     --green:#39d353; --green-dim:#146c37; --cyan:#58a6ff; --white:#e6edf3;
-    --red:#ff5f56; --yellow:#ffbd2e;
+    --red:#ff5f56; --yellow:#ffbd2e; --orange:#f0883e;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--white);
@@ -56,12 +56,17 @@
   .hint kbd{background:var(--bg2);border:1px solid var(--frame);border-radius:4px;
     padding:1px 6px;color:var(--white);cursor:pointer;}
 
-  /* stat cards */
-  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-    gap:10px;margin:18px 0;}
-  .stat{border:1px solid var(--frame);border-radius:8px;padding:12px;background:var(--bg2);}
-  .stat .num{font-size:22px;color:var(--green);font-weight:600;}
-  .stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}
+  /* stats rows */
+  .statblock{border-top:1px solid var(--frame);padding:14px 0 4px;margin-top:6px;}
+  .statblock .cmdline{margin-bottom:10px;color:var(--white);}
+  .statblock .cmdline b{color:var(--green);font-weight:400;margin-right:8px;}
+  .statrow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));}
+  .sitem{padding:2px 14px;border-left:1px solid var(--frame);min-width:0;}
+  .sitem:first-child{border-left:none;padding-left:0;}
+  .sitem .num{font-size:22px;font-weight:600;color:var(--white);line-height:1.3;}
+  .sitem .num.hot{color:var(--orange);}
+  .sitem .lbl{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .sitem .lbl i{font-style:normal;margin-right:6px;}
 
   /* heatmap */
   .heatmap-wrap{overflow-x:auto;padding:4px 0;}
@@ -82,6 +87,8 @@
   @media (max-width:520px){
     .term{font-size:12.5px;}
     .hero pre{font-size:5px;}
+    .statrow{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:12px;}
+    .sitem,.sitem:first-child{border-left:none;padding:0 8px 0 0;}
   }
 </style>
 </head>
@@ -130,10 +137,12 @@
    Fallback contribution data (snapshot). If the live fetch fails -- offline,
    API down, whatever -- the page still works and shows the last snapshot.
    ========================================================================= */
-const FALLBACK = {"start":"2025-09-21","counts":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,8,3,0,0,0,0,0,2,0,0,4,0,3,0,1,0,0,0,0,0,0,0,0,2,0,1,0,2,1,0,0,0,0,0,0,0,0,0,1,0,0,1,3,0,0,0,0,2,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,0,0,0,0,0,1,0,2,4,0,0,3,2,0,3,1,0,3,6,2,4,7,7,1,14,4,2,5,5,5,0,0,2,2,5,6,10,0,0,5,10,1,5,10,2,2,13,11,31,28,21,2,1,6,2,14,15,15,1,1,0,6,4,4,9,1,2,6,2,1,2,3,9,12,6,5,0,3,1,0,0,9,1,5,2,1,0,0,1,4,6,2,1,0,0,1,1,9,12,2,1,1,18,8,12,0,8,0,3,5,11,3,1,0,0,0,1,4,7,3,5,0,0,1,5,9,2,0,0,0,2,1,0,2,0,0,2,11,3,0,6]};
+const FALLBACK = {"start":"2021-01-01","counts":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,3,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,4,1,2,11,3,0,0,3,0,0,0,0,0,2,3,0,0,6,0,0,0,4,0,0,9,0,0,0,0,6,0,0,0,0,0,4,3,0,6,0,0,0,0,0,0,0,3,0,0,0,6,6,0,0,4,0,0,0,0,0,0,0,0,0,24,8,2,0,11,0,4,8,3,0,3,0,3,0,21,10,4,0,3,0,4,7,19,4,3,0,1,0,0,3,0,0,0,0,0,0,0,1,0,0,0,3,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,3,3,3,0,6,2,0,5,5,4,6,5,5,2,10,7,5,8,4,2,0,2,2,4,10,0,4,2,4,3,7,2,10,4,0,4,2,2,2,8,5,1,1,4,3,8,9,2,0,0,5,2,0,2,0,11,2,7,7,1,6,4,3,2,5,4,4,2,7,3,6,9,8,18,1,6,2,1,7,13,8,12,6,15,8,8,11,8,20,5,1,5,7,2,9,0,3,9,12,16,7,13,9,21,3,0,6,7,10,21,2,2,7,4,0,0,1,0,7,10,5,15,0,0,0,0,2,0,0,0,13,9,1,5,3,15,0,0,0,0,0,0,1,4,0,4,0,0,3,2,6,2,4,6,5,4,8,5,6,8,4,5,7,6,4,2,6,15,22,2,2,4,2,0,0,0,0,1,0,1,0,0,0,14,4,1,14,12,0,1,2,0,13,2,13,0,0,1,0,0,5,10,0,0,1,2,4,2,6,0,5,7,0,0,4,7,0,5,5,5,0,1,5,0,2,0,3,3,2,1,0,0,1,0,0,4,4,0,11,0,0,1,7,5,1,0,12,6,7,6,4,0,12,4,6,4,5,2,0,5,3,3,3,1,0,0,1,3,0,0,23,8,0,3,6,7,3,14,8,2,10,4,3,7,2,7,2,7,4,5,0,0,6,0,7,3,3,10,1,7,2,6,2,3,0,0,0,0,0,0,0,0,0,0,2,11,4,7,6,20,0,2,0,18,14,5,15,0,0,9,4,5,14,11,0,0,7,9,3,0,1,0,1,0,2,3,0,1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,7,0,3,0,0,0,0,1,0,2,0,5,3,1,3,1,0,0,4,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,4,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,4,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,1,2,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,2,0,0,0,1,2,3,0,3,0,3,4,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,3,0,0,0,0,0,0,0,0,0,0,3,0,0,0,6,0,0,3,7,3,0,0,0,0,3,0,0,6,0,0,3,3,0,0,0,0,3,0,3,0,0,0,5,2,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,5,0,0,0,0,0,0,4,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,8,3,0,0,0,0,0,2,0,0,4,0,3,0,1,0,0,0,0,0,0,0,0,2,0,1,0,2,1,0,0,0,0,0,0,0,0,0,1,0,0,1,3,0,0,0,0,2,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,0,0,0,0,0,1,0,2,4,0,0,3,2,0,3,1,0,3,6,2,4,7,7,1,14,4,2,5,5,5,0,0,2,2,5,6,10,0,0,5,10,1,5,10,2,2,13,11,31,28,21,2,1,6,2,14,15,15,1,1,0,6,4,4,9,1,2,6,2,1,2,3,9,12,6,5,0,3,1,0,0,9,1,5,2,1,0,0,1,4,6,2,1,0,0,1,1,9,12,2,1,1,18,8,12,0,8,0,3,5,11,3,1,0,0,0,1,4,7,3,5,0,0,1,5,9,2,0,0,0,2,1,0,2,0,0,2,11,3,0,11],"repos":39,"since":"2021-01-20"};
 
-const GITHUB_USER = "captainrogers69";
-const LIVE_DATA_URL = `https://github-contributions-api.jogruber.de/v4/${GITHUB_USER}?y=last`;
+const GITHUB_USER = "captainrogers69";   // real account (links + data)
+const DISPLAY_USER = "mayank-mobiledev"; // what the page shows
+const CONTRIB_URL = `https://github-contributions-api.jogruber.de/v4/${GITHUB_USER}?y=all`;
+const USER_URL = `https://api.github.com/users/${GITHUB_USER}`;
 
 const BANNER = `    __  ________  _____    _   ____ __    __  _____    ____  ___ _    __
    /  |/  /   \\ \\/ /   |  / | / / //_/    \\ \\/ /   |  / __ \\/   | |  / /
@@ -162,11 +171,21 @@ function appendEl(el) {
   div.appendChild(el);
   term.appendChild(div);
   term.scrollTop = term.scrollHeight;
+  return div;
 }
 
 /* ---------------------------------------------------------------------- */
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 function isoDate(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+function fmtDay(iso) {   // "2026-06-24" -> "Jun 24 '26"
+  const [y, m, d] = iso.split("-");
+  return `${MONTHS[+m - 1]} ${+d} '${y.slice(2)}`;
+}
+function fmtMonth(ym) {  // "2026-06" -> "Jun '26"
+  const [y, m] = ym.split("-");
+  return `${MONTHS[+m - 1]} '${y.slice(2)}`;
 }
 
 function expandFallback(fb) {
@@ -178,10 +197,8 @@ function expandFallback(fb) {
   });
 }
 
-// Turn a raw day list into the stats the UI needs.
+// Streaks, best day, totals for a sorted day list.
 function summarize(days) {
-  const today = isoDate(new Date());
-  days = days.filter((d) => d.date <= today);
   const total = days.reduce((s, d) => s + d.count, 0);
 
   let longest = { length: 0, start: null, end: null };
@@ -207,65 +224,127 @@ function summarize(days) {
 
   const best = days.reduce((b, d) => (d.count > b.count ? d : b), { date: "-", count: 0 });
 
+  const byMonth = {};
+  days.forEach((d) => { const k = d.date.slice(0, 7); byMonth[k] = (byMonth[k] || 0) + d.count; });
+  const topMonth = Object.entries(byMonth).reduce((b, e) => (e[1] > b[1] ? e : b), ["-", 0]);
+
+  const byYear = {};
+  days.forEach((d) => { const k = d.date.slice(0, 4); byYear[k] = (byYear[k] || 0) + d.count; });
+  const bestYear = Object.entries(byYear).reduce((b, e) => (e[1] > b[1] ? e : b), ["-", 0]);
+
   return {
     days,
     total,
-    active_days: days.filter((d) => d.count > 0).length,
     current_streak: current,
     longest_streak: longest,
     best_day: best,
+    top_month: { month: topMonth[0], total: topMonth[1] },
+    best_year: { year: bestYear[0], total: bestYear[1] },
     range: { start: days[0].date, end: days[days.length - 1].date },
   };
 }
 
-let DATA = null;
+// Last year = GitHub-style window: 52 weeks back from today, aligned to Sunday.
+function lastYear(days) {
+  const from = new Date();
+  from.setDate(from.getDate() - 364);
+  from.setDate(from.getDate() - from.getDay());
+  const cut = isoDate(from);
+  return days.filter((d) => d.date >= cut);
+}
+
+let DATA = null;       // last-year summary (+ DATA.all for all-time)
 window.__getData = () => DATA; // debug hook
 
 async function loadData() {
-  let days;
+  const today = isoDate(new Date());
+  let days, repos = FALLBACK.repos, since = FALLBACK.since;
+
+  const contrib = fetch(CONTRIB_URL, { cache: "no-store" }).then((r) => {
+    if (!r.ok) throw new Error("bad status " + r.status);
+    return r.json();
+  });
+  const user = fetch(USER_URL).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+
   try {
-    const res = await fetch(LIVE_DATA_URL, { cache: "no-store" });
-    if (!res.ok) throw new Error("bad status " + res.status);
-    const json = await res.json();
+    const json = await contrib;
     days = json.contributions.map((d) => ({ date: d.date, count: d.count }));
     if (!days.length) throw new Error("empty");
   } catch (e) {
     days = expandFallback(FALLBACK);
   }
-  DATA = summarize(days);
+  days = days.filter((d) => d.date <= today).sort((a, b) => (a.date < b.date ? -1 : 1));
+
+  const u = await user;
+  if (u && typeof u.public_repos === "number") { repos = u.public_repos; since = u.created_at.slice(0, 10); }
+
+  DATA = summarize(lastYear(days));
+  DATA.all = summarize(days);
+  DATA.all.repos = repos;
+  DATA.all.since = since;
   renderStats();
 }
 
 /* ---------------------------------------------------------------------- */
-function countUp(el, target) {
+function countUp(el, target, fmt) {
   const dur = 900;
   const start = performance.now();
   function tick(now) {
     const p = Math.min(1, (now - start) / dur);
-    el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))).toLocaleString();
+    el.textContent = fmt(Math.round(target * (1 - Math.pow(1 - p, 3))));
     if (p < 1) requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
 }
+const num = (n) => n.toLocaleString();
+const days_ = (n) => n + "d";
+const plain = (n) => String(n);
+
+// [value, formatter, emoji, label, extra class]
+function statRows() {
+  const y = DATA, a = DATA.all;
+  return [
+    ["stats --year", [
+      [y.current_streak.length, days_, "🔥", "current streak", "hot"],
+      [y.total, num, "📈", "contributions"],
+      [y.longest_streak.length, days_, "⚡", "longest streak"],
+      [y.best_day.count, num, "🏆", `best · ${y.best_day.count ? fmtDay(y.best_day.date) : "-"}`],
+      [y.top_month.total, num, "📅", `top month · ${y.top_month.total ? fmtMonth(y.top_month.month) : "-"}`],
+    ]],
+    ["stats --all-time", [
+      [a.total, num, "📊", "total"],
+      [a.longest_streak.length, days_, "⚡", "longest streak"],
+      [a.best_year.total, num, "🚀", `best year · ${a.best_year.year}`],
+      [+a.since.slice(0, 4), plain, "🗓️", "on GitHub since"],
+      [a.repos, num, "📦", "public repos"],
+    ]],
+  ];
+}
+
+function buildStatsEl() {
+  const wrap = document.createElement("div");
+  statRows().forEach(([cmd, items]) => {
+    const block = document.createElement("div");
+    block.className = "statblock";
+    block.innerHTML = `<div class="cmdline"><b>$</b>${cmd}</div><div class="statrow"></div>`;
+    const row = block.querySelector(".statrow");
+    items.forEach(([val, fmt, icon, label, cls]) => {
+      const item = document.createElement("div");
+      item.className = "sitem";
+      item.innerHTML = `<div class="num ${cls || ""}">${fmt(0)}</div><div class="lbl" title="${label}"><i>${icon}</i>${label}</div>`;
+      row.appendChild(item);
+      countUp(item.querySelector(".num"), val, fmt);
+    });
+    wrap.appendChild(block);
+  });
+  return wrap;
+}
 
 function renderStats() {
-  if (!DATA) return;
   const box = document.getElementById("statsBox");
-  if (!box) return;
-  const stats = [
-    [DATA.total, "contributions (1y)"],
-    [DATA.current_streak.length, "day streak"],
-    [DATA.longest_streak.length, "day best streak"],
-    [DATA.best_day.count, "in one day"],
-  ];
+  if (!box || !DATA) return;
   box.innerHTML = "";
-  stats.forEach(([val, label]) => {
-    const card = document.createElement("div");
-    card.className = "stat";
-    card.innerHTML = `<div class="num">0</div><div class="lbl">${label}</div>`;
-    box.appendChild(card);
-    countUp(card.querySelector(".num"), val);
-  });
+  box.appendChild(buildStatsEl());
 }
 
 /* ---------------------------------------------------------------------- */
@@ -334,6 +413,7 @@ const COMMANDS = {
       ["projects", "apps I've shipped"],
       ["education", "degrees"],
       ["contributions", "live GitHub contribution heatmap"],
+      ["stats", "yearly + all-time GitHub stats"],
       ["streak", "current / longest streak"],
       ["contact", "how to reach me"],
       ["open <site>", "portfolio | github | linkedin | instagram"],
@@ -405,6 +485,10 @@ const COMMANDS = {
     line(`<span class="out-green">longest streak:</span>  ${s(DATA.longest_streak)}`);
     line(`<span class="out-green">best day:</span>        ${DATA.best_day.count} contributions on ${DATA.best_day.date}`);
     line(`<span class="out-green">total:</span>           ${DATA.total.toLocaleString()} contributions since ${DATA.range.start}`);
+  },
+  stats() {
+    if (!DATA) { line(`<span class="out-dim">loading contribution data...</span>`); return; }
+    appendEl(buildStatsEl());
   },
   contributions() {
     if (!DATA) { line(`<span class="out-dim">loading contribution data...</span>`); return; }
@@ -510,12 +594,12 @@ function startMatrix() {
 
 /* ---------------------------------------------------------------------- */
 function boot() {
-  line(`<span class="out-green">connected to github.com/mayank-mobiledev</span>`);
+  line(`<span class="out-green">connected to github.com/${DISPLAY_USER}</span>`);
   line(`<span class="out-dim">type 'help' to see available commands</span>`);
   blank();
   const statsWrap = document.createElement("div");
   statsWrap.className = "line";
-  statsWrap.innerHTML = `<div class="stats" id="statsBox"></div>`;
+  statsWrap.id = "statsBox";
   term.appendChild(statsWrap);
   blank();
   runCommand("whoami");
